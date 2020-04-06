@@ -31,11 +31,14 @@ import time
 
 from datetime import date
 
+# select which AET and direction you want to use
 
 AET = 'AET10'
 direct = 'EB'
 
 csv_file = 'combined_mar_29.csv'
+
+# create 15 minute buckets
 
 hours = [
 '12:00 AM','12:15 AM','12:30 AM','12:45 AM','1:00 AM','1:15 AM','1:30 AM','1:45 AM',
@@ -53,8 +56,7 @@ hours = [
 ]
 
 # create a list of just March data for this AET
-
-   
+ 
 with open(csv_file, newline='') as csvfile:
     csv = csv.reader(csvfile, delimiter=';', quotechar='|')
 
@@ -87,6 +89,7 @@ with open(csv_file, newline='') as csvfile:
 # create a list for percentiles, 1-99 for volume, 1-90 for speed
 # since 90 is almost always free flow, 95 and 99 tell us nothing
 # speed since removed from this file
+        # there was a reason I called this tvs_list and I don't remember
         
         if line[0] == AET and line[1] == direct and doy < 6: # weekdays only, use > 5 for weekends
                             
@@ -94,6 +97,9 @@ with open(csv_file, newline='') as csvfile:
             
     for hour in hours:
 
+        # I have other files which do speed/volume comparison, so that's still here
+        # volume percentile, speed, piles, etc
+        
         vpc_list = []
         spc_list = []
         piles = []
@@ -103,6 +109,8 @@ with open(csv_file, newline='') as csvfile:
             if i[0] == hour:
                 vpc_list.append(i[1])
                 spc_list.append(i[2])
+
+    # do all the percentile calculations, then append it to all the list
 
         vpc_1 = np.percentile(vpc_list,1)
         vpc_5 = np.percentile(vpc_list,5)
@@ -136,7 +144,7 @@ with open(csv_file, newline='') as csvfile:
 
             
 
-# Location text
+# Location text, just a lookup for titling
 
     if AET == 'AET09':
         loc = 'Edgell Rd, Framingham'
@@ -275,7 +283,8 @@ for line in piles_list:
     
         labels.append('')
     
-    # create bottoms
+    # create bottoms, for the stacked line chart
+    # this could be done as a stacked area, too, but I have the code for bars, so …
 
     top1.append(float(line[1])*4)
     top5.append(float(line[2])*4)
@@ -303,6 +312,8 @@ for line in piles_list:
     v95.append(p9095)
     v99.append(p9599)
 
+# create all the parameters for the charts
+
 fig, ax1 = plt.subplots()
 
 N = 96
@@ -321,9 +332,13 @@ v5 = ax1.bar(ind, v90, width, bottom = top50, color = '#bbbbbb')
 v6 = ax1.bar(ind, v95, width, bottom = top90, color = '#cccccc')
 v7 = ax1.bar(ind, v99, width, bottom = top95, color = '#dddddd')
 
-#ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+#ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis if you need/want
+# this is for the speed/volume chart, with just volumes, meh.
 ##ax2.set_ylabel('Speed')
 #ax2.set_ylim(0,7500)
+
+# there is probably a good way to get color gradations on this
+# I should ask @splillo how he makes his charts
                       
 #e1 = ax1.plot(ind, d1, linewidth = 1, color = 'blue')
 e2 = ax1.plot(ind, d2, linewidth = 1, color = 'red')

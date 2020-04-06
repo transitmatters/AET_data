@@ -29,6 +29,7 @@ list_to_scrape = [
 
 all_rows = []
 
+#scrapes lists one by one, which is easier for error handling
 
 for i in list_to_scrape:    
 
@@ -85,7 +86,7 @@ for i in list_to_scrape:
     
     date_to = ''
     
-    csv_loc = 'batch/combined_short.csv' # <-- change this file name as needed!
+    csv_loc = 'combined_mar_29.csv' # <-- change this file name as needed!
     # look in http://ariofsevit.com/files/AET/ for the large file
     
     with open(csv_loc, newline='') as csvfile:
@@ -126,7 +127,9 @@ for i in list_to_scrape:
         
         if date_text == date_to:
             
-            break
+            break #break when you've gotten as far back as the last data
+        
+        # create a py date from the date in the data
         
         year = int(date_text.split('-')[0])
         month = int(date_text.split('-')[1])
@@ -145,7 +148,7 @@ for i in list_to_scrape:
     
         # create an empty list for each day, necessary to then delete rows w/o data
         
-    #    day_of_rows = []
+    #   create a short list for each date, start adding items to the list
         day_short = []
         
         for row in rows:
@@ -182,18 +185,13 @@ for i in list_to_scrape:
                 except:
                     speed = 0
             cell_list.append(speed)
+            
+            # append the rest o the stuff
+
             short_list.append(cell_list[1])
             short_list.append(cell_list[-2])
             short_list.append(cell_list[-1])
 
-    # this adds the day of week, but py can do this elsewhere
-
-#            short_list.append(day_of_week)
-#            if day_of_week > 4:
-#                short_list.append(0)
-#            else:
-#                short_list.append(1)
-    #        day_of_rows.append(cell_list)
             day_short.append(short_list)
         #    print(len(day_of_rows)) # use this to check progress if interested
         
@@ -231,7 +229,7 @@ for i in list_to_scrape:
     
     import csv
         
-    with open('new_download.csv', 'w') as f:
+    with open('new_mar_30.csv', 'w') as f:
         writer = csv.writer(f, delimiter=';', lineterminator='\n')
         writer.writerows(all_rows)
         
